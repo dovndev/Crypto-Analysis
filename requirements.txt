@@ -1,0 +1,6 @@
+Flask
+Gunicorn
+ccxt
+asyncio
+pandas
+ta
