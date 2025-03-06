@@ -6,9 +6,8 @@
 from ccxt.base.exchange import Exchange
 from ccxt.abstract.woo import ImplicitAPI
 import hashlib
-from ccxt.base.types import Account, Balances, Bool, Conversion, Currencies, Currency, DepositAddress, Int, LedgerEntry, Leverage, MarginModification, Market, MarketType, Num, Order, OrderBook, OrderSide, OrderType, Str, Strings, FundingRate, FundingRates, Trade, TradingFees, Transaction, TransferEntry
+from ccxt.base.types import Account, Any, Balances, Bool, Conversion, Currencies, Currency, DepositAddress, Int, LedgerEntry, Leverage, MarginModification, Market, MarketType, Num, Order, OrderBook, OrderSide, OrderType, Str, Strings, FundingRate, FundingRates, Trade, TradingFees, Transaction, TransferEntry
 from typing import List
-from typing import Any
 from ccxt.base.errors import ExchangeError
 from ccxt.base.errors import AuthenticationError
 from ccxt.base.errors import ArgumentsRequired
@@ -24,7 +23,7 @@ from ccxt.base.precise import Precise
 
 class woo(Exchange, ImplicitAPI):
 
-    def describe(self):
+    def describe(self) -> Any:
         return self.deep_extend(super(woo, self).describe(), {
             'id': 'woo',
             'name': 'WOO X',
@@ -358,17 +357,20 @@ class woo(Exchange, ImplicitAPI):
                         'limit': 500,
                         'daysBack': 90,
                         'untilDays': 10000,
+                        'symbolRequired': False,
                     },
                     'fetchOrder': {
                         'marginMode': False,
                         'trigger': True,
                         'trailing': False,
+                        'symbolRequired': False,
                     },
                     'fetchOpenOrders': {
                         'marginMode': False,
                         'limit': 500,
                         'trigger': True,
                         'trailing': True,
+                        'symbolRequired': False,
                     },
                     'fetchOrders': {
                         'marginMode': False,
@@ -377,6 +379,7 @@ class woo(Exchange, ImplicitAPI):
                         'untilDays': 100000,
                         'trigger': True,
                         'trailing': True,
+                        'symbolRequired': False,
                     },
                     'fetchClosedOrders': {
                         'marginMode': False,
@@ -386,6 +389,7 @@ class woo(Exchange, ImplicitAPI):
                         'untilDays': 100000,
                         'trigger': True,
                         'trailing': True,
+                        'symbolRequired': False,
                     },
                     'fetchOHLCV': {
                         'limit': 1000,
@@ -479,7 +483,7 @@ class woo(Exchange, ImplicitAPI):
             'info': response,
         }
 
-    def fetch_time(self, params={}):
+    def fetch_time(self, params={}) -> Int:
         """
         fetches the current integer timestamp in milliseconds from the exchange server
 
@@ -1132,6 +1136,7 @@ class woo(Exchange, ImplicitAPI):
                 'algoType': 'POSITIONAL_TP_SL',
                 'childOrders': [],
             }
+            childOrders = outterOrder['childOrders']
             closeSide = 'SELL' if (orderSide == 'BUY') else 'BUY'
             if stopLoss is not None:
                 stopLossPrice = self.safe_string(stopLoss, 'triggerPrice', stopLoss)
@@ -1142,7 +1147,7 @@ class woo(Exchange, ImplicitAPI):
                     'type': 'CLOSE_POSITION',
                     'reduceOnly': True,
                 }
-                outterOrder['childOrders'].append(stopLossOrder)
+                childOrders.append(stopLossOrder)
             if takeProfit is not None:
                 takeProfitPrice = self.safe_string(takeProfit, 'triggerPrice', takeProfit)
                 takeProfitOrder: dict = {
@@ -1152,7 +1157,7 @@ class woo(Exchange, ImplicitAPI):
                     'type': 'CLOSE_POSITION',
                     'reduceOnly': True,
                 }
-                outterOrder['childOrders'].append(takeProfitOrder)
+                childOrders.append(takeProfitOrder)
             request['childOrders'] = [outterOrder]
         params = self.omit(params, ['clOrdID', 'clientOrderId', 'client_order_id', 'postOnly', 'timeInForce', 'stopPrice', 'triggerPrice', 'stopLoss', 'takeProfit', 'trailingPercent', 'trailingAmount', 'trailingTriggerPrice'])
         response = None
@@ -2150,7 +2155,9 @@ class woo(Exchange, ImplicitAPI):
         :param dict [params]: extra parameters specific to the exchange API endpoint
         :returns dict: a `ledger structure <https://docs.ccxt.com/#/?id=ledger>`
         """
-        currency, rows = self.get_asset_history_rows(code, since, limit, params)
+        currencyRows = self.get_asset_history_rows(code, since, limit, params)
+        currency = self.safe_value(currencyRows, 0)
+        rows = self.safe_list(currencyRows, 1)
         return self.parse_ledger(rows, currency, since, limit, params)
 
     def parse_ledger_entry(self, item: dict, currency: Currency = None) -> LedgerEntry:
@@ -2250,7 +2257,9 @@ class woo(Exchange, ImplicitAPI):
         request: dict = {
             'type': 'BALANCE',
         }
-        currency, rows = self.get_asset_history_rows(code, since, limit, self.extend(request, params))
+        currencyRows = self.get_asset_history_rows(code, since, limit, self.extend(request, params))
+        currency = self.safe_value(currencyRows, 0)
+        rows = self.safe_list(currencyRows, 1)
         #
         #     {
         #         "rows":[],
@@ -3119,7 +3128,7 @@ class woo(Exchange, ImplicitAPI):
         }
         return self.v1PrivatePostClientIsolatedMargin(self.extend(request, params))
 
-    def fetch_position(self, symbol: Str = None, params={}):
+    def fetch_position(self, symbol: Str, params={}):
         self.load_markets()
         market = self.market(symbol)
         request: dict = {

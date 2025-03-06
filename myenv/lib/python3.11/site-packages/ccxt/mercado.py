@@ -6,7 +6,7 @@
 from ccxt.base.exchange import Exchange
 from ccxt.abstract.mercado import ImplicitAPI
 import hashlib
-from ccxt.base.types import Balances, Currency, Int, Market, Num, Order, OrderBook, OrderSide, OrderType, Str, Ticker, Trade, Transaction
+from ccxt.base.types import Any, Balances, Currency, Int, Market, Num, Order, OrderBook, OrderSide, OrderType, Str, Ticker, Trade, Transaction
 from typing import List
 from ccxt.base.errors import ExchangeError
 from ccxt.base.errors import ArgumentsRequired
@@ -17,7 +17,7 @@ from ccxt.base.precise import Precise
 
 class mercado(Exchange, ImplicitAPI):
 
-    def describe(self):
+    def describe(self) -> Any:
         return self.deep_extend(super(mercado, self).describe(), {
             'id': 'mercado',
             'name': 'Mercado Bitcoin',
@@ -193,17 +193,20 @@ class mercado(Exchange, ImplicitAPI):
                         'limit': None,  # todo
                         'daysBack': 100000,  # todo
                         'untilDays': 100000,  # todo
+                        'symbolRequired': True,
                     },
                     'fetchOrder': {
                         'marginMode': False,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': True,
                     },
                     'fetchOpenOrders': {
                         'marginMode': False,
                         'limit': None,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': True,
                     },
                     'fetchOrders': {
                         'marginMode': False,
@@ -212,6 +215,7 @@ class mercado(Exchange, ImplicitAPI):
                         'untilDays': 100000,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': True,
                     },
                     'fetchClosedOrders': None,
                     'fetchOHLCV': {

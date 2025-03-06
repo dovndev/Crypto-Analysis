@@ -5,7 +5,7 @@
 
 from ccxt.async_support.base.exchange import Exchange
 from ccxt.abstract.luno import ImplicitAPI
-from ccxt.base.types import Account, Balances, Currency, Int, LedgerEntry, Market, Num, Order, OrderBook, OrderSide, OrderType, Str, Strings, Ticker, Tickers, Trade, TradingFeeInterface
+from ccxt.base.types import Account, Any, Balances, Currency, Int, LedgerEntry, Market, Num, Order, OrderBook, OrderSide, OrderType, Str, Strings, Ticker, Tickers, Trade, TradingFeeInterface
 from typing import List
 from ccxt.base.errors import ExchangeError
 from ccxt.base.errors import ArgumentsRequired
@@ -15,7 +15,7 @@ from ccxt.base.precise import Precise
 
 class luno(Exchange, ImplicitAPI):
 
-    def describe(self):
+    def describe(self) -> Any:
         return self.deep_extend(super(luno, self).describe(), {
             'id': 'luno',
             'name': 'luno',
@@ -214,17 +214,20 @@ class luno(Exchange, ImplicitAPI):
                         'limit': 1000,
                         'daysBack': 100000,  # todo
                         'untilDays': 100000,  # todo
+                        'symbolRequired': True,
                     },
                     'fetchOrder': {
                         'marginMode': False,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': False,
                     },
                     'fetchOpenOrders': {
                         'marginMode': False,
                         'limit': 1000,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': False,
                     },
                     'fetchOrders': {
                         'marginMode': False,
@@ -233,6 +236,7 @@ class luno(Exchange, ImplicitAPI):
                         'untilDays': None,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': False,
                     },
                     'fetchClosedOrders': {
                         'marginMode': False,
@@ -242,6 +246,7 @@ class luno(Exchange, ImplicitAPI):
                         'untilDays': None,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': False,
                     },
                     'fetchOHLCV': {
                         'limit': None,
@@ -543,7 +548,7 @@ class luno(Exchange, ImplicitAPI):
         response = await self.privateGetOrdersId(self.extend(request, params))
         return self.parse_order(response)
 
-    async def fetch_orders_by_state(self, state=None, symbol: Str = None, since: Int = None, limit: Int = None, params={}):
+    async def fetch_orders_by_state(self, state: Str, symbol: Str = None, since: Int = None, limit: Int = None, params={}):
         await self.load_markets()
         request: dict = {}
         market = None

@@ -1,4 +1,4 @@
-#!/home/dovndev/myenv/bin/python3
+#!/home/dovndev/Projects/Crypto-Analysis/myenv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

@@ -7,7 +7,7 @@ from ccxt.async_support.base.exchange import Exchange
 from ccxt.abstract.lbank import ImplicitAPI
 import asyncio
 import hashlib
-from ccxt.base.types import Balances, Currency, DepositAddress, Int, Market, Num, Order, OrderBook, OrderSide, OrderType, Str, Strings, Ticker, Tickers, FundingRate, FundingRates, Trade, TradingFeeInterface, TradingFees, Transaction
+from ccxt.base.types import Any, Balances, Currency, DepositAddress, Int, Market, Num, Order, OrderBook, OrderSide, OrderType, Str, Strings, Ticker, Tickers, FundingRate, FundingRates, Trade, TradingFeeInterface, TradingFees, Transaction
 from typing import List
 from ccxt.base.errors import ExchangeError
 from ccxt.base.errors import AuthenticationError
@@ -28,7 +28,7 @@ from ccxt.base.precise import Precise
 
 class lbank(Exchange, ImplicitAPI):
 
-    def describe(self):
+    def describe(self) -> Any:
         return self.deep_extend(super(lbank, self).describe(), {
             'id': 'lbank',
             'name': 'LBank',
@@ -340,17 +340,20 @@ class lbank(Exchange, ImplicitAPI):
                         'limit': 100,
                         'daysBack': 100000,  # todo
                         'untilDays': 2,
+                        'symbolRequired': True,
                     },
                     'fetchOrder': {
                         'marginMode': False,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': True,
                     },
                     'fetchOpenOrders': {
                         'marginMode': False,
                         'limit': 200,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': True,
                     },
                     'fetchOrders': {
                         'marginMode': False,
@@ -359,6 +362,7 @@ class lbank(Exchange, ImplicitAPI):
                         'untilDays': None,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': True,
                     },
                     'fetchClosedOrders': None,  # todo: through fetchOrders "status" -1: Cancelled 0: Unfilled 1: Partially filled 2: Completely filled 3: Partially filled has been cancelled 4: Cancellation is being processed
                     'fetchOHLCV': {
@@ -381,7 +385,7 @@ class lbank(Exchange, ImplicitAPI):
             },
         })
 
-    async def fetch_time(self, params={}):
+    async def fetch_time(self, params={}) -> Int:
         """
         fetches the current integer timestamp in milliseconds from the exchange server
 
@@ -2670,7 +2674,8 @@ class lbank(Exchange, ImplicitAPI):
                         if resultValue is None:
                             result[code] = self.deposit_withdraw_fee([fee])
                         else:
-                            result[code]['info'].append(fee)
+                            resultCodeInfo = result[code]['info']
+                            resultCodeInfo.append(fee)
                         chain = self.safe_string(fee, 'chain')
                         networkCode = self.safe_string(self.options['inverse-networks'], chain, chain)
                         if networkCode is not None:

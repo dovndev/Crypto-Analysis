@@ -6,7 +6,7 @@
 from ccxt.base.exchange import Exchange
 from ccxt.abstract.probit import ImplicitAPI
 import math
-from ccxt.base.types import Balances, Currencies, Currency, DepositAddress, Int, Market, Num, Order, OrderBook, OrderSide, OrderType, Str, Strings, Ticker, Tickers, Trade, Transaction
+from ccxt.base.types import Any, Balances, Currencies, Currency, DepositAddress, Int, Market, Num, Order, OrderBook, OrderSide, OrderType, Str, Strings, Ticker, Tickers, Trade, Transaction
 from typing import List
 from ccxt.base.errors import ExchangeError
 from ccxt.base.errors import AuthenticationError
@@ -28,7 +28,7 @@ from ccxt.base.precise import Precise
 
 class probit(Exchange, ImplicitAPI):
 
-    def describe(self):
+    def describe(self) -> Any:
         return self.deep_extend(super(probit, self).describe(), {
             'id': 'probit',
             'name': 'ProBit',
@@ -217,17 +217,20 @@ class probit(Exchange, ImplicitAPI):
                         'limit': 1000,
                         'daysBack': 100000,  # todo
                         'untilDays': 100000,  # todo
+                        'symbolRequired': False,
                     },
                     'fetchOrder': {
                         'marginMode': False,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': True,
                     },
                     'fetchOpenOrders': {
                         'marginMode': False,
                         'limit': None,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': False,
                     },
                     'fetchOrders': None,
                     'fetchClosedOrders': {
@@ -238,6 +241,7 @@ class probit(Exchange, ImplicitAPI):
                         'untilDays': 90,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': False,
                     },
                     'fetchOHLCV': {
                         'limit': 4000,
@@ -934,7 +938,7 @@ class probit(Exchange, ImplicitAPI):
             'fee': fee,
         }, market)
 
-    def fetch_time(self, params={}):
+    def fetch_time(self, params={}) -> Int:
         """
 
         https://docs-en.probit.com/reference/time

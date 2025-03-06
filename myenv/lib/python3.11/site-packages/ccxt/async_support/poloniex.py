@@ -6,7 +6,7 @@
 from ccxt.async_support.base.exchange import Exchange
 from ccxt.abstract.poloniex import ImplicitAPI
 import hashlib
-from ccxt.base.types import Balances, Currencies, Currency, DepositAddress, Int, Market, Num, Order, OrderBook, OrderSide, OrderType, Str, Strings, Ticker, Tickers, Trade, TradingFees, Transaction, TransferEntry
+from ccxt.base.types import Any, Balances, Currencies, Currency, DepositAddress, Int, Market, Num, Order, OrderBook, OrderSide, OrderType, Str, Strings, Ticker, Tickers, Trade, TradingFees, Transaction, TransferEntry
 from typing import List
 from ccxt.base.errors import ExchangeError
 from ccxt.base.errors import AuthenticationError
@@ -28,7 +28,7 @@ from ccxt.base.precise import Precise
 
 class poloniex(Exchange, ImplicitAPI):
 
-    def describe(self):
+    def describe(self) -> Any:
         return self.deep_extend(super(poloniex, self).describe(), {
             'id': 'poloniex',
             'name': 'Poloniex',
@@ -317,17 +317,20 @@ class poloniex(Exchange, ImplicitAPI):
                         'limit': 1000,
                         'daysBack': 100000,
                         'untilDays': 100000,
+                        'symbolRequired': False,
                     },
                     'fetchOrder': {
                         'marginMode': False,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': False,
                     },
                     'fetchOpenOrders': {
                         'marginMode': False,
                         'limit': 2000,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': False,
                     },
                     'fetchOrders': None,
                     'fetchClosedOrders': None,  # todo implement
@@ -645,7 +648,7 @@ class poloniex(Exchange, ImplicitAPI):
             'info': market,
         }
 
-    async def fetch_time(self, params={}):
+    async def fetch_time(self, params={}) -> Int:
         """
         fetches the current integer timestamp in milliseconds from the exchange server
 
@@ -1777,7 +1780,7 @@ class poloniex(Exchange, ImplicitAPI):
         network = self.safe_string_upper(params, 'network')  # self line allows the user to specify either ERC20 or ETH
         network = self.safe_string(networks, network, network)  # handle ERC20>ETH alias
         if network is not None:
-            request['currency'] += network  # when network the currency need to be changed to currency+network https://docs.poloniex.com/#withdraw on MultiChain Currencies section
+            request['currency'] = request['currency'] + network  # when network the currency need to be changed to currency+network https://docs.poloniex.com/#withdraw on MultiChain Currencies section
             params = self.omit(params, 'network')
         else:
             if currency['id'] == 'USDT':
@@ -1823,7 +1826,7 @@ class poloniex(Exchange, ImplicitAPI):
         network = self.safe_string_upper(params, 'network')  # self line allows the user to specify either ERC20 or ETH
         network = self.safe_string(networks, network, network)  # handle ERC20>ETH alias
         if network is not None:
-            request['currency'] += network  # when network the currency need to be changed to currency+network https://docs.poloniex.com/#withdraw on MultiChain Currencies section
+            request['currency'] = request['currency'] + network  # when network the currency need to be changed to currency+network https://docs.poloniex.com/#withdraw on MultiChain Currencies section
             params = self.omit(params, 'network')
         else:
             if currency['id'] == 'USDT':
@@ -1928,7 +1931,7 @@ class poloniex(Exchange, ImplicitAPI):
         network = self.safe_string_upper(params, 'network')  # self line allows the user to specify either ERC20 or ETH
         network = self.safe_string(networks, network, network)  # handle ERC20>ETH alias
         if network is not None:
-            request['currency'] += network  # when network the currency need to be changed to currency+network https://docs.poloniex.com/#withdraw on MultiChain Currencies section
+            request['currency'] = request['currency'] + network  # when network the currency need to be changed to currency+network https://docs.poloniex.com/#withdraw on MultiChain Currencies section
             params = self.omit(params, 'network')
         response = await self.privatePostWalletsWithdraw(self.extend(request, params))
         #

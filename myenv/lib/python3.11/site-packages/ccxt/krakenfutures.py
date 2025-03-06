@@ -6,7 +6,7 @@
 from ccxt.base.exchange import Exchange
 from ccxt.abstract.krakenfutures import ImplicitAPI
 import hashlib
-from ccxt.base.types import Balances, Currency, Int, Leverage, Leverages, LeverageTier, LeverageTiers, Market, Num, Order, OrderBook, OrderRequest, OrderSide, OrderType, Str, Strings, Ticker, Tickers, FundingRate, FundingRates, Trade, TransferEntry
+from ccxt.base.types import Any, Balances, Currency, Int, Leverage, Leverages, LeverageTier, LeverageTiers, Market, Num, Order, OrderBook, OrderRequest, OrderSide, OrderType, Str, Strings, Ticker, Tickers, FundingRate, FundingRates, Trade, TransferEntry
 from typing import List
 from ccxt.base.errors import ExchangeError
 from ccxt.base.errors import AuthenticationError
@@ -29,7 +29,7 @@ from ccxt.base.precise import Precise
 
 class krakenfutures(Exchange, ImplicitAPI):
 
-    def describe(self):
+    def describe(self) -> Any:
         return self.deep_extend(super(krakenfutures, self).describe(), {
             'id': 'krakenfutures',
             'name': 'Kraken Futures',
@@ -313,6 +313,7 @@ class krakenfutures(Exchange, ImplicitAPI):
                         'limit': None,
                         'daysBack': None,
                         'untilDays': 100000,
+                        'symbolRequired': False,
                     },
                     'fetchOrder': None,
                     'fetchOpenOrders': {
@@ -320,6 +321,7 @@ class krakenfutures(Exchange, ImplicitAPI):
                         'limit': None,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': False,
                     },
                     'fetchOrders': None,
                     'fetchClosedOrders': {
@@ -330,6 +332,7 @@ class krakenfutures(Exchange, ImplicitAPI):
                         'untilDays': None,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': False,
                     },
                     'fetchOHLCV': {
                         'limit': 5000,
@@ -1488,13 +1491,13 @@ class krakenfutures(Exchange, ImplicitAPI):
         return self.parse_orders(canceledAndRejected, market, since, limit)
 
     def parse_order_type(self, orderType):
-        map: dict = {
+        typesMap: dict = {
             'lmt': 'limit',
             'mkt': 'market',
             'post': 'limit',
             'ioc': 'market',
         }
-        return self.safe_string(map, orderType, orderType)
+        return self.safe_string(typesMap, orderType, orderType)
 
     def verify_order_action_success(self, status, method, omit=[]):
         errors: dict = {

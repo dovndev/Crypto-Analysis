@@ -7,7 +7,7 @@ from ccxt.base.exchange import Exchange
 from ccxt.abstract.btcbox import ImplicitAPI
 import hashlib
 import json
-from ccxt.base.types import Balances, Int, Market, Num, Order, OrderBook, OrderSide, OrderType, Str, Strings, Ticker, Tickers, Trade
+from ccxt.base.types import Any, Balances, Int, Market, Num, Order, OrderBook, OrderSide, OrderType, Str, Strings, Ticker, Tickers, Trade
 from typing import List
 from ccxt.base.errors import ExchangeError
 from ccxt.base.errors import AuthenticationError
@@ -23,7 +23,7 @@ from ccxt.base.precise import Precise
 
 class btcbox(Exchange, ImplicitAPI):
 
-    def describe(self):
+    def describe(self) -> Any:
         return self.deep_extend(super(btcbox, self).describe(), {
             'id': 'btcbox',
             'name': 'BtcBox',
@@ -147,12 +147,14 @@ class btcbox(Exchange, ImplicitAPI):
                         'marginMode': False,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': True,
                     },
                     'fetchOpenOrders': {
                         'marginMode': False,
                         'limit': 100,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': True,
                     },
                     'fetchOrders': {
                         'marginMode': False,
@@ -161,6 +163,7 @@ class btcbox(Exchange, ImplicitAPI):
                         'untilDays': None,
                         'trigger': False,
                         'trailing': False,
+                        'symbolRequired': True,
                     },
                     'fetchClosedOrders': None,
                     'fetchOHLCV': None,
@@ -652,8 +655,6 @@ class btcbox(Exchange, ImplicitAPI):
     def fetch_orders_by_type(self, type, symbol: Str = None, since: Int = None, limit: Int = None, params={}):
         self.load_markets()
         # a special case for btcbox – default symbol is BTC/JPY
-        if symbol is None:
-            symbol = 'BTC/JPY'
         market = self.market(symbol)
         request: dict = {
             'type': type,  # 'open' or 'all'
