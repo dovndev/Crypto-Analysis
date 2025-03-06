@@ -1,4 +1,5 @@
 Flask
+Flask[async]
 Gunicorn
 ccxt
 asyncio
