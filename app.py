@@ -7,7 +7,9 @@ from flask import Flask, render_template_string
 app = Flask(__name__)
 
 # Initialize Binance exchange (async version)
-exchange = ccxt.binance()
+
+exchange = ccxt.kucoin()  # Change from ccxt.binance() to ccxt.kucoin()
+
 
 async def get_all_pairs():
     # Fetch all markets available on Binance
